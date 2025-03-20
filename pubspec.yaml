@@ -16,6 +16,9 @@ dependencies:
   cupertino_icons: ^1.0.6
   google_maps_flutter: ^2.5.3
   provider: ^6.1.1
+  location: ^5.0.3
+  permission_handler: ^11.2.1
+  flutter_background_geolocation: ^4.11.1
 
 dev_dependencies:
   flutter_test:
