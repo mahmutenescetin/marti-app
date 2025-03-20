@@ -3,7 +3,7 @@ import 'package:marti_app/core/theme/app_theme.dart';
 import 'package:marti_app/views/home/home_view.dart';
 import 'package:provider/provider.dart';
 
-import 'viewmodels/home_viewmodel.dart';
+import 'package:marti_app/viewmodels/home_viewmodel.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

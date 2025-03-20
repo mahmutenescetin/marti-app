@@ -8,7 +8,7 @@ extension ContextExtension on BuildContext {
 
   Color get primaryColor => colors.primary;
   Color get secondaryColor => colors.secondary;
-  Color get backgroundColor => colors.background;
+  Color get backgroundColor => colors.surface;
   Color get surfaceColor => colors.surface;
   Color get errorColor => colors.error;
   Color get textPrimaryColor => colors.onSurface;
