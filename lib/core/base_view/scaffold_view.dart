@@ -21,7 +21,7 @@ class ScaffoldView extends StatelessWidget {
   final bool extendBodyBehindAppBar;
 
   const ScaffoldView({
-    super.key,
+    required this.body, super.key,
     this.appBarTitle,
     this.appBarActions,
     this.appBarLeading,
@@ -30,7 +30,6 @@ class ScaffoldView extends StatelessWidget {
     this.appBarBackgroundColor,
     this.appBarElevation,
     this.appBarAutomaticallyImplyLeading = true,
-    required this.body,
     this.floatingActionButton,
     this.floatingActionButtonLocation,
     this.backgroundColor,
