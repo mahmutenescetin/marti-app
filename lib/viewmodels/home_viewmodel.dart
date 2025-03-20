@@ -1,4 +1,3 @@
 import 'package:flutter/cupertino.dart';
 
-class CounterViewModel extends ChangeNotifier{
-}
+class CounterViewModel extends ChangeNotifier {}
