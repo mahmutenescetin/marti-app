@@ -7,15 +7,15 @@ class PermissionDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text('Konum İzni Gerekli'),
+      title: const Text('Location Permission Required'),
       content: const Text(
-        'Haritayı kullanabilmek için konum iznine ihtiyacımız var. '
-        'Lütfen uygulama ayarlarından konum iznini etkinleştirin.',
+        'We need location permission to use the map. '
+            'Please enable location permission in the app settings.',
       ),
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: const Text('İptal'),
+          child: const Text('Cancel'),
         ),
         TextButton(
           onPressed: () async {
@@ -24,7 +24,7 @@ class PermissionDialog extends StatelessWidget {
               Navigator.pop(context);
             }
           },
-          child: const Text('Ayarlara Git'),
+          child: const Text('Go to Settings'),
         ),
       ],
     );
