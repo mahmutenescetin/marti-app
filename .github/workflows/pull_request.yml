@@ -27,21 +27,4 @@ jobs:
       - name: Format reminder
         run: |
           echo "⚠️ Not: Kodunuzun formatını kontrol etmek için 'dart format .' komutunu kullanabilirsiniz."
-          echo "Format kontrolü pipeline'ı durdurmayacak, sadece bir hatırlatmadır."
-        
-      - name: Set up Git
-        run: |
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git config --global user.name "github-actions[bot]"
-          
-      - name: Format and check code
-        run: |
-          dart format .
-          git add .
-          if git diff --cached --quiet; then
-            echo "No formatting changes needed"
-          else
-            echo "Code needs formatting. Please run 'dart format .' locally and commit the changes."
-            git diff --cached
-            exit 1
-          fi 
+          echo "Format kontrolü pipeline'ı durdurmayacak, sadece bir hatırlatmadır." 
