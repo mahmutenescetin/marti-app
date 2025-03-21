@@ -9,9 +9,7 @@ class HomeView extends StatelessWidget {
   Future<void> _handleMapNavigation(BuildContext context) async {
     await Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (context) => const MapsView(),
-      ),
+      MaterialPageRoute(builder: (context) => const MapsView()),
     );
   }
 
@@ -29,10 +27,7 @@ class HomeView extends StatelessWidget {
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
-                    colors: [
-                      context.primaryColor,
-                      context.secondaryColor,
-                    ],
+                    colors: [context.primaryColor, context.secondaryColor],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                   ),
@@ -44,24 +39,21 @@ class HomeView extends StatelessWidget {
                     Text(
                       'Welcome!',
                       style: context.textStyles.h1.copyWith(
-                        color: Colors.white,
+                        color: context.textPrimaryColor,
                       ),
                     ),
                     const SizedBox(height: 8),
                     Text(
                       'Marti Example App is a sample application that follows your location and shows it on the map.',
                       style: context.textStyles.bodyLarge.copyWith(
-                        color: Colors.white.withOpacity(0.9),
+                        color: context.textPrimaryColor,
                       ),
                     ),
                   ],
                 ),
               ),
               const SizedBox(height: 24),
-              Text(
-                'Quick Actions',
-                style: context.textStyles.h2,
-              ),
+              Text('Quick Actions', style: context.textStyles.h2),
               const SizedBox(height: 16),
               GridView.count(
                 shrinkWrap: true,
@@ -122,22 +114,18 @@ class HomeView extends StatelessWidget {
         decoration: BoxDecoration(
           color: context.surfaceColor,
           borderRadius: BorderRadius.circular(12),
-          boxShadow: [
+          boxShadow: const [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              color: Colors.black,
               blurRadius: 10,
-              offset: const Offset(0, 4),
+              offset: Offset(0, 4),
             ),
           ],
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              icon,
-              size: 32,
-              color: context.primaryColor,
-            ),
+            Icon(icon, size: 32, color: context.primaryColor),
             const SizedBox(height: 12),
             Text(
               title,

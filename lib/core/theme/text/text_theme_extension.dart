@@ -21,9 +21,6 @@ extension TextStyleExtension on TextStyle {
 
   TextStyle withColor(Color color) => copyWith(color: color);
 
-  TextStyle withOpacity(double opacity) =>
-      copyWith(color: color?.withOpacity(opacity));
-
   TextStyle withHeight(double height) => copyWith(height: height);
 
   TextStyle withLetterSpacing(double spacing) =>
