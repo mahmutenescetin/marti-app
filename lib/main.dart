@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:marti_app/core/theme/app_theme.dart';
+import 'package:marti_app/services/location_service.dart' show LocationService;
 import 'package:marti_app/views/home/home_view.dart';
 import 'package:provider/provider.dart';
 
@@ -24,6 +25,7 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => CounterViewModel()),
+        ChangeNotifierProvider(create: (_) => LocationService()),
       ],
       child: MaterialApp(
         title: 'Marti Example App',
