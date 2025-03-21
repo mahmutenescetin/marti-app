@@ -22,7 +22,7 @@ class LocationInfoDialog extends StatelessWidget {
             const SizedBox(height: 16),
             _InfoRow(title: 'DateTime:', value: locationInfo['date'] ?? ''),
             _InfoRow(
-              title: 'Spees:',
+              title: 'Speed:',
               value: '${locationInfo['speed'] ?? ''} km/h',
             ),
             _InfoRow(title: 'Latitude:', value: locationInfo['latitude'] ?? ''),
