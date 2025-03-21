@@ -24,5 +24,13 @@ jobs:
       - name: Analyze project source
         run: flutter analyze
         
-      - name: Check formatting
-        run: dart format --set-exit-if-changed . 
+      - name: Format code
+        run: dart format .
+        
+      - name: Check if any files were formatted
+        run: |
+          if [ -n "$(git status --porcelain)" ]; then
+            echo "Code formatting is incorrect. Please run 'dart format .' locally and commit the changes."
+            git diff
+            exit 1
+          fi 
