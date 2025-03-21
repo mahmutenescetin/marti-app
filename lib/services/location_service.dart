@@ -1,195 +1,204 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:flutter_background_geolocation/flutter_background_geolocation.dart'
-    as bg;
-import 'package:permission_handler/permission_handler.dart';
+import 'package:location/location.dart';
+import 'package:permission_handler/permission_handler.dart' as permission;
+
+typedef LocationInfoCallback = void Function(Map<String, String> locationInfo);
 
 class LocationService extends ChangeNotifier {
+  final Location _location = Location();
+  StreamSubscription<LocationData>? _locationSubscription;
+  final List<LatLng> _routePoints = [];
   Set<Marker> _markers = {};
   Set<Polyline> _polylines = {};
-  List<LatLng> _routePoints = [];
+  LocationInfoCallback? _dialogCallback;
+  bool _isDisposed = false;
   bool _isTracking = false;
-  bool _hasShownPermissionDialog = false;
-  LatLng? _initialPosition;
-  Function(Map<String, String>)? _dialogCallback;
 
   Set<Marker> get markers => _markers;
+
   Set<Polyline> get polylines => _polylines;
+
+  List<LatLng> get routePoints => _routePoints;
+
   bool get isTracking => _isTracking;
-  bool get hasShownPermissionDialog => _hasShownPermissionDialog;
-  LatLng? get initialPosition => _initialPosition;
 
-  LocationService() {
-    _initializeLocation();
-
-    debugPrint('LocationService constructor');
+  void setDialogCallback(LocationInfoCallback callback) {
+    _dialogCallback = callback;
   }
 
-  Future<void> _initializeLocation() async {
-    try {
-      await bg.BackgroundGeolocation.ready(bg.Config(
-        desiredAccuracy: bg.Config.DESIRED_ACCURACY_HIGH,
-        distanceFilter: 10.0,
-        stopOnTerminate: false,
-        startOnBoot: true,
-        debug: false,
-        logLevel: bg.Config.LOG_LEVEL_VERBOSE,
-        notification: bg.Notification(
-          title: 'Location Track',
-          text: 'Location Tracking',
-          channelName: 'Location Service',
-        ),
-      ));
+  void _safeNotifyListeners() {
+    if (_isDisposed) {
+      return;
+    }
 
-      // İlk konumu al
-      final location = await bg.BackgroundGeolocation.getCurrentPosition(
-        timeout: 30,
-        maximumAge: 5000,
-        desiredAccuracy: 10,
-        persist: false,
-      );
-
-      _initialPosition = LatLng(
-        location.coords.latitude,
-        location.coords.longitude,
-      );
-      debugPrint(
-          'Initial position set: ${_initialPosition?.latitude}, ${_initialPosition?.longitude}');
+    if (SchedulerBinding.instance.schedulerPhase == SchedulerPhase.idle) {
       notifyListeners();
-
-      // Konum değişikliği dinleyicisi
-      bg.BackgroundGeolocation.onLocation((bg.Location location) {
-        _handleNewLocation(location);
+    } else {
+      SchedulerBinding.instance.addPostFrameCallback((_) {
+        if (!_isDisposed) {
+          notifyListeners();
+        }
       });
-    } catch (e) {
-      debugPrint('Initialize location error: $e');
-    }
-  }
-
-  void _handleNewLocation(bg.Location location) {
-    try {
-      final newPosition =
-          LatLng(location.coords.latitude, location.coords.longitude);
-
-      final markerId = MarkerId(DateTime.now().toString());
-      final DateTime now = DateTime.now();
-      final String formattedDate =
-          '${now.day}/${now.month}/${now.year} ${now.hour}:${now.minute}:${now.second}';
-
-      final double speed = location.coords.speed * 3.6;
-      final String formattedSpeed = speed.toStringAsFixed(1);
-
-      // Konum bilgilerini bir map'te saklayalım
-      final locationInfo = {
-        'id': markerId.value,
-        'date': formattedDate,
-        'speed': formattedSpeed,
-        'latitude': location.coords.latitude.toStringAsFixed(6),
-        'longitude': location.coords.longitude.toStringAsFixed(6),
-        'altitude': location.coords.altitude.toStringAsFixed(1),
-      };
-
-      final newMarker = Marker(
-        markerId: markerId,
-        position: newPosition,
-        onTap: () {
-          if (_dialogCallback != null) {
-            _dialogCallback!(locationInfo);
-          }
-        },
-      );
-
-      _routePoints.add(newPosition);
-
-      final polyline = Polyline(
-        polylineId: const PolylineId('route'),
-        points: _routePoints,
-        color: Colors.blue,
-        width: 5,
-        patterns: [
-          PatternItem.dash(20),
-          PatternItem.gap(10),
-        ],
-      );
-
-      _markers = Set<Marker>.from(_markers)..add(newMarker);
-      _polylines = {polyline};
-
-      notifyListeners();
-    } catch (e) {
-      debugPrint('Handle new location error: $e');
-    }
-  }
-
-  Future<PermissionStatus> checkLocationPermission() async {
-    try {
-      final state = await bg.BackgroundGeolocation.requestPermission();
-
-      if (state == bg.ProviderChangeEvent.AUTHORIZATION_STATUS_ALWAYS) {
-        return PermissionStatus.granted;
-      } else if (state == bg.ProviderChangeEvent.AUTHORIZATION_STATUS_DENIED) {
-        return PermissionStatus.denied;
-      } else if (state ==
-          bg.ProviderChangeEvent.AUTHORIZATION_STATUS_RESTRICTED) {
-        return PermissionStatus.permanentlyDenied;
-      }
-
-      return PermissionStatus.denied;
-    } catch (e) {
-      debugPrint('Check location permission error: $e');
-      return PermissionStatus.denied;
     }
   }
 
   Future<bool> requestPermission() async {
     try {
-      final status = await bg.BackgroundGeolocation.requestPermission();
-      return status == bg.ProviderChangeEvent.AUTHORIZATION_STATUS_ALWAYS;
+      final serviceEnabled = await _location.serviceEnabled();
+      if (!serviceEnabled) {
+        final serviceRequest = await _location.requestService();
+        if (!serviceRequest) {
+          debugPrint('Location service is not enabled');
+          return false;
+        }
+      }
+
+      var permissionStatus = await _location.hasPermission();
+      if (permissionStatus == PermissionStatus.denied) {
+        permissionStatus = await _location.requestPermission();
+        if (permissionStatus != PermissionStatus.granted) {
+          debugPrint('Location permission denied');
+          return false;
+        }
+      }
+
+      final backgroundPermission =
+          await permission.Permission.locationAlways.request();
+      if (!backgroundPermission.isGranted) {
+        debugPrint('Background location permission denied');
+      }
+
+      debugPrint('All permissions granted');
+      return true;
     } catch (e) {
-      debugPrint('Request location permission error: $e');
+      debugPrint('permission error: $e');
       return false;
     }
   }
 
-  void startTracking() async {
-    if (!_isTracking) {
-      // Eğer initial position henüz alınmamışsa tekrar dene
-      if (_initialPosition == null) {
-        await _initializeLocation();
-      }
+  Future<void> startTracking() async {
+    if (_locationSubscription != null || _isTracking) {
+      debugPrint('Location tracking is already started');
+      return;
+    }
+
+    final hasPermission = await requestPermission();
+    if (!hasPermission) {
+      debugPrint(
+        'Location tracking could not be started due to lack of permissions',
+      );
+      return;
+    }
+
+    try {
+      await _location.changeSettings(
+        accuracy: LocationAccuracy.high,
+        interval: 5000,
+        distanceFilter: 10,
+      );
 
       _isTracking = true;
-      await bg.BackgroundGeolocation.start();
-      notifyListeners();
+      _safeNotifyListeners();
+
+      debugPrint('location tracking started');
+      _locationSubscription = _location.onLocationChanged.listen(
+        (locationData) {
+          if (_isDisposed) {
+            return;
+          }
+
+          debugPrint(
+            'New location added: ${locationData.latitude}, ${locationData.longitude}',
+          );
+
+          final position = LatLng(
+            locationData.latitude ?? 0,
+            locationData.longitude ?? 0,
+          );
+
+          _routePoints.add(position);
+
+          final newMarker = Marker(
+            markerId: MarkerId(DateTime.now().toString()),
+            position: position,
+            onTap: () {
+              if (_dialogCallback != null) {
+                _dialogCallback!({
+                  'latitude': position.latitude.toStringAsFixed(6),
+                  'longitude': position.longitude.toStringAsFixed(6),
+                  'Time': DateTime.now().toString(),
+                });
+              }
+            },
+          );
+
+          _markers = Set<Marker>.from(_markers)..add(newMarker);
+          debugPrint('New marker added. Marker count is: ${_markers.length}');
+
+          if (_routePoints.length > 1) {
+            final newPolyline = Polyline(
+              polylineId: const PolylineId('route'),
+              points: _routePoints,
+              color: Colors.blue,
+              width: 5,
+            );
+
+            _polylines = {newPolyline};
+          }
+
+          _safeNotifyListeners();
+        },
+        onError: (e) {
+          debugPrint('Location tracking error $e');
+        },
+      );
+    } catch (e) {
+      debugPrint('Location tracking start error: $e');
     }
   }
 
-  void stopTracking() {
-    if (_isTracking) {
-      bg.BackgroundGeolocation.stop();
-      _isTracking = false;
-      notifyListeners();
+  void stopTracking({required bool isStopButtonPressed}) {
+    if (!_isTracking) {
+      return;
     }
-  }
 
-  void setPermissionDialogShown(bool value) {
-    _hasShownPermissionDialog = value;
-  }
+    debugPrint('Location tracking stopped');
+    if (!isStopButtonPressed) {
+      _routePoints.clear();
+      _markers = {};
+      _polylines = {};
+    }
+    _locationSubscription?.cancel();
+    _locationSubscription = null;
+    _isTracking = false;
 
-  void setDialogCallback(Function(Map<String, String>) callback) {
-    _dialogCallback = callback;
+    SchedulerBinding.instance.addPostFrameCallback((_) {
+      if (!_isDisposed) {
+        notifyListeners();
+      }
+    });
+
+    debugPrint('Location tracking stopped');
   }
 
   void clearRoute() {
+    if (_isDisposed) {
+      return;
+    }
+
+    _routePoints.clear();
     _markers = {};
     _polylines = {};
-    _routePoints = [];
-    notifyListeners();
+    _safeNotifyListeners();
   }
 
   @override
   void dispose() {
-    stopTracking();
+    _isDisposed = true;
+    stopTracking(isStopButtonPressed: false);
     super.dispose();
   }
 }

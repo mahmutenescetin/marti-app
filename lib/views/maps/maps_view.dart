@@ -26,14 +26,14 @@ class MapsView extends StatelessWidget {
     DialogUtil.instance.show(
       context,
       child: AlertDialog(
-        title: const Text('Rotayı Temizle'),
+        title: const Text('Clear Route'),
         content: const Text(
-          'Tüm rota ve konum işaretleri silinecek. Emin misiniz?',
+          'All route and location markers will be deleted. Are you sure?',
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('İptal'),
+            child: const Text('Cancel'),
           ),
           TextButton(
             onPressed: () {
@@ -41,7 +41,7 @@ class MapsView extends StatelessWidget {
               Navigator.of(context).pop();
             },
             style: TextButton.styleFrom(foregroundColor: Colors.red),
-            child: const Text('Temizle'),
+            child: const Text('Clear'),
           ),
         ],
       ),
@@ -62,6 +62,8 @@ class MapsView extends StatelessWidget {
       child: Consumer<MapsViewModel>(
         builder: (context, viewModel, child) {
           final initialPosition = viewModel.initialPosition;
+          final markers = viewModel.markers;
+          debugPrint('Marker count: ${markers.length}');
 
           return ScaffoldView(
             appBarTitle: 'Location Tracking',
@@ -72,7 +74,7 @@ class MapsView extends StatelessWidget {
                     target: initialPosition ?? const LatLng(41.0082, 28.9784),
                     zoom: initialPosition != null ? 16 : 14,
                   ),
-                  markers: viewModel.markers,
+                  markers: markers,
                   polylines: viewModel.polylines,
                   onMapCreated: (controller) {
                     viewModel.onMapCreated(controller);
@@ -94,15 +96,41 @@ class MapsView extends StatelessWidget {
                     color: Colors.white,
                     child: const Center(child: CircularProgressIndicator()),
                   ),
-
                 Positioned(
                   top: 16,
                   right: 16,
-                  child: FloatingActionButton(
-                    heroTag: 'clear_route_button',
-                    onPressed: () => _showClearConfirmationDialog(context),
-                    backgroundColor: Colors.white,
-                    child: const Icon(Icons.clear_all, color: Colors.red),
+                  child: Column(
+                    children: [
+                      FloatingActionButton(
+                        heroTag: 'clear_route_button',
+                        onPressed: () => _showClearConfirmationDialog(context),
+                        backgroundColor: Colors.white,
+                        child: const Icon(Icons.clear_all, color: Colors.red),
+                      ),
+                      const SizedBox(height: 16),
+                      Consumer<LocationService>(
+                        builder: (context, locationService, child) {
+                          final isTracking = locationService.isTracking;
+                          return FloatingActionButton(
+                            heroTag: 'toggle_tracking_button',
+                            onPressed: () {
+                              if (isTracking) {
+                                locationService.stopTracking(
+                                  isStopButtonPressed: true,
+                                );
+                              } else {
+                                locationService.startTracking();
+                              }
+                            },
+                            backgroundColor: Colors.white,
+                            child: Icon(
+                              isTracking ? Icons.pause : Icons.play_arrow,
+                              color: isTracking ? Colors.red : Colors.green,
+                            ),
+                          );
+                        },
+                      ),
+                    ],
                   ),
                 ),
               ],
