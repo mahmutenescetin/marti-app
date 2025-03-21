@@ -8,6 +8,7 @@ import 'package:provider/provider.dart';
 class MapsView extends StatelessWidget {
   const MapsView({super.key});
 
+
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(

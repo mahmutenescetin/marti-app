@@ -1,0 +1,30 @@
+name: Pull Request
+
+on:
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  build:
+    name: Build and Test
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.29.2'
+          channel: 'stable'
+          
+      - name: Install dependencies
+        run: flutter pub get
+        
+      - name: Analyze project source
+        run: flutter analyze
+        
+      - name: Format reminder
+        run: |
+          echo "⚠️ Not: Kodunuzun formatını kontrol etmek için 'dart format .' komutunu kullanabilirsiniz."
+          echo "Format kontrolü pipeline'ı durdurmayacak, sadece bir hatırlatmadır." 
