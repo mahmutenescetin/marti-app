@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:marti_app/core/lifecycle/app_lifecycle_manager.dart';
 import 'package:marti_app/core/theme/app_theme.dart';
 import 'package:marti_app/services/location_service.dart' show LocationService;
 import 'package:marti_app/views/home/home_view.dart';
@@ -27,10 +28,12 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => CounterViewModel()),
         ChangeNotifierProvider(create: (_) => LocationService()),
       ],
-      child: MaterialApp(
-        title: 'Marti Example App',
-        home: const HomeView(),
-        theme: AppTheme().light,
+      child: AppLifecycleManager(
+        child: MaterialApp(
+          title: 'Marti Example App',
+          home: const HomeView(),
+          theme: AppTheme().light,
+        ),
       ),
     );
   }

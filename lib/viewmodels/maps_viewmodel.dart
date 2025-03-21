@@ -1,62 +1,49 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:marti_app/services/location_service.dart' show LocationService;
+import 'package:marti_app/services/location_service.dart';
 
 class MapsViewModel extends ChangeNotifier {
   final LocationService _locationService;
-  GoogleMapController? mapController;
-  bool isMapInitialized = false;
-  Set<Marker> _markers = {};
-  Set<Polyline> _polylines = {};
-
-  LatLng? get initialPosition => _locationService.initialPosition;
+  GoogleMapController? _mapController;
+  bool _isMapInitialized = false;
+  bool _isDisposed = false;
 
   MapsViewModel(this._locationService) {
     _locationService.addListener(_onLocationServiceChanged);
-    _markers = _locationService.markers;
-    _polylines = _locationService.polylines;
   }
 
-  Set<Marker> get markers => _markers;
+  bool get isMapInitialized => _isMapInitialized;
 
-  Set<Polyline> get polylines => _polylines;
+  Set<Marker> get markers => _locationService.markers;
 
-  bool get isTracking => _locationService.isTracking;
+  Set<Polyline> get polylines => _locationService.polylines;
 
-  void showMarkerInfo(MarkerId markerId) {
-    mapController?.showMarkerInfoWindow(markerId);
-  }
-
-  void onMapCreated(GoogleMapController controller) {
-    mapController = controller;
-    isMapInitialized = true;
-    notifyListeners();
-  }
-
-  void startTracking() {
-    _locationService.startTracking();
-  }
-
-  void stopTracking() {
-    _locationService.stopTracking();
-  }
+  LatLng? get initialPosition => null;
 
   void _onLocationServiceChanged() {
-    final newMarkers = _locationService.markers;
-    final newPolylines = _locationService.polylines;
-
-    if (_markers != newMarkers || _polylines != newPolylines) {
-      _markers = newMarkers;
-      _polylines = newPolylines;
+    if (!_isDisposed) {
       notifyListeners();
     }
   }
 
+  void onMapCreated(GoogleMapController controller) {
+    _mapController = controller;
+    _isMapInitialized = true;
+    if (!_isDisposed) {
+      notifyListeners();
+    }
+  }
+
+  Future<void> startTracking() async {
+    await _locationService.startTracking();
+  }
+
   @override
   void dispose() {
+    _isDisposed = true;
     _locationService.removeListener(_onLocationServiceChanged);
-    mapController?.dispose();
-    stopTracking();
+    _locationService.stopTracking(isStopButtonPressed: false);
+    _mapController?.dispose();
     super.dispose();
   }
 }
