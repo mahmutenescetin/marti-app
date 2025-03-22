@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:marti_app/core/base_view/scaffold_view.dart';
-
+import 'package:marti_app/core/localization/context_localization_extension.dart';
 import 'package:marti_app/core/utils/dialog_util.dart' show DialogUtil;
 import 'package:marti_app/core/widgets/location_info_dialog.dart'
     show LocationInfoDialog;
@@ -26,14 +26,12 @@ class MapsView extends StatelessWidget {
     DialogUtil.instance.show(
       context,
       child: AlertDialog(
-        title: const Text('Clear Route'),
-        content: const Text(
-          'All route and location markers will be deleted. Are you sure?',
-        ),
+        title: Text(context.l10n.clearRoute),
+        content: Text(context.l10n.clearRouteConfirmation),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Cancel'),
+            child: Text(context.l10n.cancel),
           ),
           TextButton(
             onPressed: () {
@@ -41,7 +39,7 @@ class MapsView extends StatelessWidget {
               Navigator.of(context).pop();
             },
             style: TextButton.styleFrom(foregroundColor: Colors.red),
-            child: const Text('Clear'),
+            child: Text(context.l10n.clear),
           ),
         ],
       ),
@@ -63,10 +61,11 @@ class MapsView extends StatelessWidget {
         builder: (context, viewModel, child) {
           final initialPosition = viewModel.initialPosition;
           final markers = viewModel.markers;
-          debugPrint('Marker count: ${markers.length}');
+
+          debugPrint('Marker sayısı: ${markers.length}');
 
           return ScaffoldView(
-            appBarTitle: 'Location Tracking',
+            appBarTitle: context.l10n.maps,
             body: Stack(
               children: [
                 GoogleMap(
@@ -115,9 +114,7 @@ class MapsView extends StatelessWidget {
                             heroTag: 'toggle_tracking_button',
                             onPressed: () {
                               if (isTracking) {
-                                locationService.stopTracking(
-                                  isStopButtonPressed: true,
-                                );
+                                locationService.stopTracking(isStopButtonPressed: true);
                               } else {
                                 locationService.startTracking();
                               }

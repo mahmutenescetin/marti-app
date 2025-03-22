@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:marti_app/core/localization/context_localization_extension.dart';
 
 class LocationInfoDialog extends StatelessWidget {
   final Map<String, String> locationInfo;
@@ -20,26 +21,21 @@ class LocationInfoDialog extends StatelessWidget {
               style: Theme.of(context).textTheme.titleLarge,
             ),
             const SizedBox(height: 16),
-            _InfoRow(title: 'DateTime:', value: locationInfo['date'] ?? ''),
+            _InfoRow(title: '${context.l10n.time}:', value: locationInfo['date'] ?? ''),
             _InfoRow(
-              title: 'Speed:',
-              value: '${locationInfo['speed'] ?? ''} km/h',
+              title: '${context.l10n.latitude}:',
+              value: locationInfo['latitude'] ?? '',
             ),
-            _InfoRow(title: 'Latitude:', value: locationInfo['latitude'] ?? ''),
             _InfoRow(
-              title: 'Longitude:',
+              title: '${context.l10n.longitude}:',
               value: locationInfo['longitude'] ?? '',
-            ),
-            _InfoRow(
-              title: 'Altitude:',
-              value: '${locationInfo['altitude'] ?? ''}m',
             ),
             const SizedBox(height: 16),
             Align(
               alignment: Alignment.centerRight,
               child: TextButton(
                 onPressed: () => Navigator.of(context).pop(),
-                child: const Text('Close'),
+                child: Text(context.l10n.close),
               ),
             ),
           ],
