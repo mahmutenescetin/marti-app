@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:marti_app/core/lifecycle/app_lifecycle_manager.dart';
-import 'package:marti_app/core/localization/localization_manager.dart';
-import 'package:marti_app/core/theme/app_theme.dart';
-import 'package:marti_app/services/location_service.dart' show LocationService;
-import 'package:marti_app/views/home/home_view.dart';
+import 'package:marti_app/app/core/l10n/generated/app_localizations.dart' show AppLocalizations;
+import 'package:marti_app/app/core/lifecycle/app_lifecycle_manager.dart';
+import 'package:marti_app/app/core/localization/localization_manager.dart';
+import 'package:marti_app/app/common/theme/app_theme.dart';
+import 'package:marti_app/app/features/maps/manager/location_tracking_manager.dart';
+import 'package:marti_app/app/features/home/presentation/view/home_view.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-
-import 'package:marti_app/viewmodels/home_viewmodel.dart';
+import 'package:marti_app/app/features/home/presentation/viewmodel/home_viewmodel.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -18,7 +17,15 @@ void main() async {
     debugPrint('Flutter Error: ${details.toString()}');
   };
 
-  runApp(const MyApp());
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => LocalizationManager()),
+        ChangeNotifierProvider(create: (_) => LocationTrackingManager()),
+      ],
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -29,7 +36,7 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => CounterViewModel()),
-        ChangeNotifierProvider(create: (_) => LocationService()),
+        ChangeNotifierProvider(create: (_) => LocationTrackingManager()),
         ChangeNotifierProvider(create: (_) => LocalizationManager()),
       ],
       child: Consumer<LocalizationManager>(
