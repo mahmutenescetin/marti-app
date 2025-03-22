@@ -43,4 +43,31 @@ class DialogUtil {
       Navigator.of(context).pop(result);
     }
   }
+
+  Future<bool?> showConfirmationDialog({
+    required BuildContext context,
+    required String title,
+    required String content,
+    required String confirmText,
+    required String cancelText,
+  }) {
+    return show<bool>(
+      context,
+      child: AlertDialog(
+        title: Text(title),
+        content: Text(content),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: Text(cancelText),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            child: Text(confirmText),
+          ),
+        ],
+      ),
+    );
+  }
 }

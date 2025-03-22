@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:marti_app/services/location_service.dart' show LocationService;
+import 'package:marti_app/app/features/maps/manager/location_tracking_manager.dart';
 import 'package:provider/provider.dart';
 
 class AppLifecycleManager extends StatefulWidget {
-  final Widget child;
+  const AppLifecycleManager({
+    required this.child, super.key,
+  });
 
-  const AppLifecycleManager({required this.child, super.key});
+  final Widget child;
 
   @override
   State<AppLifecycleManager> createState() => _AppLifecycleManagerState();
@@ -27,23 +29,23 @@ class _AppLifecycleManagerState extends State<AppLifecycleManager>
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    final locationService = context.read<LocationService>();
+    final locationManager = context.read<LocationTrackingManager>();
 
     switch (state) {
       case AppLifecycleState.resumed:
-        if (!locationService.isTracking) {
-          locationService.startTracking();
+        if (!locationManager.isTracking) {
+          locationManager.startTracking();
         }
         break;
       case AppLifecycleState.inactive:
         break;
       case AppLifecycleState.paused:
-        if (!locationService.isTracking) {
-          locationService.startTracking();
+        if (!locationManager.isTracking) {
+          locationManager.startTracking();
         }
         break;
       case AppLifecycleState.detached:
-        locationService.stopTracking(isStopButtonPressed: false);
+        locationManager.stopTracking(isStopButtonPressed: false);
         break;
       case AppLifecycleState.hidden:
         break;
@@ -51,7 +53,5 @@ class _AppLifecycleManagerState extends State<AppLifecycleManager>
   }
 
   @override
-  Widget build(BuildContext context) {
-    return widget.child;
-  }
+  Widget build(BuildContext context) => widget.child;
 }

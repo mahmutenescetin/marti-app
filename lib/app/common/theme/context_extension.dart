@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:marti_app/core/theme/app_theme_extension.dart';
+import 'package:marti_app/app/common/theme/app_theme_extension.dart' show AppThemeExtension;
 
 extension ContextExtension on BuildContext {
   AppThemeExtension get textStyles =>

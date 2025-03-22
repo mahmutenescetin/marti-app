@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:marti_app/core/theme/app_colors.dart';
-import 'package:marti_app/core/theme/app_theme_extension.dart';
+import 'package:marti_app/app/common/theme/app_colors.dart' show AppColors;
+import 'package:marti_app/app/common/theme/app_theme_extension.dart' show AppThemeExtension;
+
 
 class AppTheme {
   static final AppTheme _instance = AppTheme._internal();

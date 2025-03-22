@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:marti_app/core/theme/text/text_constants.dart';
+import 'package:marti_app/app/common/theme/text/text_constants.dart' show TextConstants;
 
 class TextStyles {
   static final TextStyles _instance = TextStyles._internal();

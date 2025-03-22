@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:marti_app/core/base_view/custom_app_bar.dart';
+import 'package:marti_app/app/core/base/custom_app_bar.dart' show CustomAppBar;
 
 class ScaffoldView extends StatelessWidget {
   final String? appBarTitle;

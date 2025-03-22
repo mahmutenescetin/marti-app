@@ -7,7 +7,15 @@ import 'package:permission_handler/permission_handler.dart' as permission;
 
 typedef LocationInfoCallback = void Function(Map<String, String> locationInfo);
 
-class LocationService extends ChangeNotifier {
+/// Manages location tracking, route recording, and marker management for the maps feature.
+/// 
+/// Responsibilities:
+/// - Handles location permissions and service status
+/// - Tracks user location in real-time
+/// - Manages route points and creates polylines
+/// - Handles markers for location points
+/// - Provides callbacks for location information display
+class LocationTrackingManager extends ChangeNotifier {
   final Location _location = Location();
   StreamSubscription<LocationData>? _locationSubscription;
   final List<LatLng> _routePoints = [];
@@ -127,9 +135,9 @@ class LocationService extends ChangeNotifier {
             onTap: () {
               if (_dialogCallback != null) {
                 _dialogCallback!({
-                  'latitude': position.latitude.toStringAsFixed(6),
-                  'longitude': position.longitude.toStringAsFixed(6),
-                  'Time': DateTime.now().toString(),
+                  'Enlem': position.latitude.toStringAsFixed(6),
+                  'Boylam': position.longitude.toStringAsFixed(6),
+                  'Tarih': DateTime.now().toString(),
                 });
               }
             },
