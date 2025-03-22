@@ -18,7 +18,10 @@ class HomeView extends StatelessWidget {
 
   void _handleLanguageChange(BuildContext context) {
     final currentLocale = context.read<LocalizationManager>().currentLocale;
-    final newLocale = currentLocale.languageCode == 'tr' ? const Locale('en') : const Locale('tr');
+    final newLocale =
+        currentLocale.languageCode == 'tr'
+            ? const Locale('en')
+            : const Locale('tr');
     context.changeLocale(newLocale);
   }
 
@@ -111,11 +114,11 @@ class HomeView extends StatelessWidget {
 
 class FeatureCard extends StatelessWidget {
   const FeatureCard({
-    super.key,
     required this.icon,
     required this.title,
     required this.subtitle,
     required this.onTap,
+    super.key,
   });
 
   final IconData icon;

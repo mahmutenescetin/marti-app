@@ -4,8 +4,7 @@ import 'package:provider/provider.dart';
 
 class AppLifecycleManager extends StatefulWidget {
   const AppLifecycleManager({
-    super.key,
-    required this.child,
+    required this.child, super.key,
   });
 
   final Widget child;
