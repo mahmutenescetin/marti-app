@@ -23,7 +23,9 @@ class MapsViewModel extends ChangeNotifier {
   }
 
   Future<void> startTracking() async {
-    if (_isLoading) return;
+    if (_isLoading) {
+      return;
+    }
 
     _isLoading = true;
     notifyListeners();
